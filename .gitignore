@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Bluefish temp files
+*.*~
+
+# Generic location for files not to send
+nogit/
+
 # C extensions
 *.so
 
