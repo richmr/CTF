@@ -13,7 +13,7 @@ end complex_v10;
 architecture imp of complex_v10 is
 	-- 10 bit constants
 	constant x000 : std_logic_vector(9 downto 0) := (others => '0');
-	constant x019 : std_logic_vector(9 downto 0) := "00" & X"19";
+	constant x019 : std_logic_vector(9 downto 0) := "00" & X19;
 	constant x022 : std_logic_vector(9 downto 0) := "00" & X"22";
 	constant x024 : std_logic_vector(9 downto 0) := "00" & X"24";
 	constant x03A : std_logic_vector(9 downto 0) := "00" & X"3A";
