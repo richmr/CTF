@@ -14,17 +14,17 @@ architecture imp of complex_v10 is
 	-- 10 bit constants
 	constant x000 : std_logic_vector(9 downto 0) := (others => '0');
 	constant x019 : std_logic_vector(9 downto 0) := "00" & X19;
-	constant x022 : std_logic_vector(9 downto 0) := "00" & X"22";
-	constant x024 : std_logic_vector(9 downto 0) := "00" & X"24";
-	constant x03A : std_logic_vector(9 downto 0) := "00" & X"3A";
-	constant x066 : std_logic_vector(9 downto 0) := "00" & X"66";
-	constant x067 : std_logic_vector(9 downto 0) := "00" & X"67";
-	constant x0DE : std_logic_vector(9 downto 0) := "00" & X"DE";
-	constant x0FF : std_logic_vector(9 downto 0) := "00" & X"FF";
-	constant x111 : std_logic_vector(9 downto 0) := "01" & X"11";
-	constant x155 : std_logic_vector(9 downto 0) := "01" & X"55";
-	constant x2A5 : std_logic_vector(9 downto 0) := "10" & X"A5";
-	constant x2AA : std_logic_vector(9 downto 0) := "10" & X"AA";
+	constant x022 : std_logic_vector(9 downto 0) := "00" & X22;
+	constant x024 : std_logic_vector(9 downto 0) := "00" & X24;
+	constant x03A : std_logic_vector(9 downto 0) := "00" & X3A;
+	constant x066 : std_logic_vector(9 downto 0) := "00" & X66;
+	constant x067 : std_logic_vector(9 downto 0) := "00" & X67;
+	constant x0DE : std_logic_vector(9 downto 0) := "00" & XDE;
+	constant x0FF : std_logic_vector(9 downto 0) := "00" & XFF;
+	constant x111 : std_logic_vector(9 downto 0) := "01" & X11;
+	constant x155 : std_logic_vector(9 downto 0) := "01" & X55;
+	constant x2A5 : std_logic_vector(9 downto 0) := "10" & XA5;
+	constant x2AA : std_logic_vector(9 downto 0) := "10" & XAA;
 	
 	-- break 32-bit input Din into bytes and store it in a 10-bit value
 	signal Dinb3 : std_logic_vector(9 downto 0);
