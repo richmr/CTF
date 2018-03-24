@@ -45,7 +45,7 @@ begin
 	-- Din(31:24) drives Dout(19:10)
 	proc1 : process(Dinb3) 
 	begin
-		case to_integer(unsigned(Dinb3(7 downto 0))) is
+		case to_integer((Dinb3(7 downto 0))) is
 			when to_integer(unsigned(00 )) to to_integer(unsigned( 31 )) => Dout(19 downto 10) <= Dinb3 + x03A;
 			when to_integer(unsigned(32)) to to_integer(unsigned(42)) => Dout(19 downto 10) <= Dinb3 - x0DE;
 			when to_integer(unsigned(43)) to to_integer(unsigned(55)) => Dout(19 downto 10) <= Dinb3 XOR x2A5;
