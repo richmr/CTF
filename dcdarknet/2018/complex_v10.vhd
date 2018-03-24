@@ -46,7 +46,7 @@ begin
 	proc1 : process(Dinb3) 
 	begin
 		case to_integer((Dinb3(7 downto 0))) is
-			when to_integer(unsigned(00 )) to to_integer(unsigned( 31 )) => Dout(19 downto 10) <= Dinb3 + x03A;
+			when to_integer((00 )) to to_integer(( 31 )) => Dout(19 downto 10) <= Dinb3 + x03A;
 			when to_integer(unsigned(32)) to to_integer(unsigned(42)) => Dout(19 downto 10) <= Dinb3 - x0DE;
 			when to_integer(unsigned(43)) to to_integer(unsigned(55)) => Dout(19 downto 10) <= Dinb3 XOR x2A5;
 			when to_integer(unsigned(56)) to to_integer(unsigned(96)) => Dout(19 downto 10) <= std_logic_vector(shift_left(unsigned(Dinb3),3));
